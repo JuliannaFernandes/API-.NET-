@@ -22,7 +22,12 @@ namespace Crud.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ItemId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
 
                     b.ToTable("Carts");
                 });
@@ -31,9 +36,6 @@ namespace Crud.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CartId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ProductId")
@@ -47,8 +49,6 @@ namespace Crud.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CartId");
 
                     b.HasIndex("ProductId");
 
@@ -70,28 +70,31 @@ namespace Crud.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Crud.Models.ItemModel", b =>
+            modelBuilder.Entity("Crud.Models.CartModel", b =>
                 {
-                    b.HasOne("Crud.Models.CartModel", "Cart")
-                        .WithMany("Items")
-                        .HasForeignKey("CartId")
+                    b.HasOne("Crud.Models.ItemModel", "Item")
+                        .WithMany("Carts")
+                        .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("Crud.Models.ItemModel", b =>
+                {
                     b.HasOne("Crud.Models.ProductModel", "Product")
                         .WithMany("Items")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Cart");
-
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Crud.Models.CartModel", b =>
+            modelBuilder.Entity("Crud.Models.ItemModel", b =>
                 {
-                    b.Navigation("Items");
+                    b.Navigation("Carts");
                 });
 
             modelBuilder.Entity("Crud.Models.ProductModel", b =>

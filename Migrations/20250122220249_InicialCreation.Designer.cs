@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Crud.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250121204452_RenameItensToItems")]
-    partial class RenameItensToItems
+    [Migration("20250122220249_InicialCreation")]
+    partial class InicialCreation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,7 +78,7 @@ namespace Crud.Migrations
                     b.HasOne("Crud.Models.ItemModel", "Item")
                         .WithMany("Carts")
                         .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Item");

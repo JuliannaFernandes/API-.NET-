@@ -24,7 +24,7 @@ namespace Crud.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Itens",
+                name: "Items",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -35,9 +35,9 @@ namespace Crud.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Itens", x => x.Id);
+                    table.PrimaryKey("PK_Items", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Itens_Products_ProductId",
+                        name: "FK_Items_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -56,11 +56,11 @@ namespace Crud.Migrations
                 {
                     table.PrimaryKey("PK_Carts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Carts_Itens_ItemId",
+                        name: "FK_Carts_Items_ItemId",
                         column: x => x.ItemId,
-                        principalTable: "Itens",
+                        principalTable: "Items",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -69,8 +69,8 @@ namespace Crud.Migrations
                 column: "ItemId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Itens_ProductId",
-                table: "Itens",
+                name: "IX_Items_ProductId",
+                table: "Items",
                 column: "ProductId");
         }
 
@@ -81,7 +81,7 @@ namespace Crud.Migrations
                 name: "Carts");
 
             migrationBuilder.DropTable(
-                name: "Itens");
+                name: "Items");
 
             migrationBuilder.DropTable(
                 name: "Products");
