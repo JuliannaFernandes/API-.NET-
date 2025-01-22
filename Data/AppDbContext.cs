@@ -18,9 +18,10 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<CartModel>()
-            .HasMany(c => c.Items)
-            .WithOne()
-            .HasForeignKey(i => i.ItemsCarrinho)
+            .HasOne(c => c.Item)
+            .WithMany(i => i.Carts)  
+            .HasForeignKey(c => c.ItemId) 
+            .OnDelete(DeleteBehavior.Cascade); 
     }
 
     protected override void OnConfiguring(

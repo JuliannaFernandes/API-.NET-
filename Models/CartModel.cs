@@ -3,7 +3,8 @@ namespace Crud.Models;
 public class CartModel
 {
     public int Id { get; set; }
-    public List<ItemModel> Items { get; set; } = new List<ItemModel>();
+    public int ItemId { get; set; }
+    public ItemModel Item { get; set; }
 
 
 }

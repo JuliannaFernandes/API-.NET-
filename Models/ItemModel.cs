@@ -8,5 +8,5 @@ public class ItemModel
     public int ProductId { get; set; }
     public required ProductModel Product { get; set; }
 
-    public ICollection<CartModel> ItemsCarrinho { get; set; } = new List<CartModel>();
+    public ICollection<CartModel> Carts { get; set; } = new List<CartModel>();
 }
