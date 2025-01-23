@@ -6,4 +6,5 @@ public class CreateCartViewModel
 {
   [Required]
   public required int ItemId { get; set; }
+  public decimal QuantityCart { get; set; }
 }

@@ -6,4 +6,5 @@ public class CartDto
     public required List<ItemDto> Items { get; set; }
     
     public int ItemId { get; set; }
+    public decimal QuantityCart { get; set; }
 }
