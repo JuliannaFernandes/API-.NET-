@@ -157,6 +157,35 @@ public class CartController : ControllerBase
       });
     }
   }
+  
+  //metodo para deletar um carrinho
+  [HttpDelete("carts/{id}")]
+  public async Task<IActionResult> DeleteAsync(
+    [FromServices] AppDbContext context,
+    [FromRoute] int id)
+  {
+    var cart = await context.Carts
+      .FirstOrDefaultAsync(c => c.Id == id);
+
+    if (cart == null)
+      return NotFound(new { message = "Carrinho não encontrado." });
+
+    try
+    {
+      context.Carts.Remove(cart);
+      await context.SaveChangesAsync();
+      return NoContent();
+    }
+    catch (Exception e)
+    {
+      return StatusCode(500, new
+      {
+        message = "Erro ao deletar o carrinho.",
+        error = e.Message,
+        innerException = e.InnerException?.Message
+      });
+    }
+  }
 }
 
 
