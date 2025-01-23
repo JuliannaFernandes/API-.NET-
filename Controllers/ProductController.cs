@@ -32,7 +32,7 @@ namespace Crud.Controllers
                 .Products
                 .AsNoTracking() 
                 .FirstOrDefaultAsync(x => x.Id == id);
-            return products == null ? NotFound() : Ok(products);
+            return products == null ? NotFound(new {message = "Produto não encontrado!" }) : Ok(products);
         }
         
         // metodo para criar um novo produto
@@ -42,7 +42,7 @@ namespace Crud.Controllers
             [FromBody] CreateProductViewModel model)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             var product = new ProductModel
             {
@@ -53,11 +53,11 @@ namespace Crud.Controllers
             {
                 await context.Products.AddAsync(product);
                 await context.SaveChangesAsync();
-                return Created($"v1/products/{{product.Id}}", product);
+                return Created($"v1/products/{product.Id}", new { message = "Produto cadastrado com sucesso!", product });
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest( new {message = "Não foi possível cadastrar o produto!", error = e.Message });
             }
         }
         
@@ -68,14 +68,14 @@ namespace Crud.Controllers
             [FromRoute] int id)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
                 
             var product = await context
                 .Products
                 .FirstOrDefaultAsync(x => x.Id == id);
                 
             if (product == null)
-                return NotFound();
+                return NotFound( new {message = "Produto não encontrado!" });
                 
             try
             {
@@ -84,11 +84,11 @@ namespace Crud.Controllers
                 context.Products.Update(product);
                 await context.SaveChangesAsync();
                     
-                return Ok(product);
+                return Ok(new {message = "Produto atualizado com sucesso!" });
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest( new {message = "Não foi possível atualizar o produto!", error = e.Message });
             }
         }
         
@@ -102,17 +102,17 @@ namespace Crud.Controllers
                 .FirstOrDefaultAsync(x => x.Id == id);
             
             if (product == null)
-                return NotFound();
+                return NotFound( new {message = "Produto não encontrado!" });
                 
             try
             {
                 context.Products.Remove(product);
                 await context.SaveChangesAsync();
-                return NoContent();
+                return Ok( new {message = "Produto deletado com sucesso!" });
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest( new {message = "Não foi possível deletar o produto!" ,error = e.Message });
             }
         }
     }

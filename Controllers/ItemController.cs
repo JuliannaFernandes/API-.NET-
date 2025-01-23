@@ -43,7 +43,7 @@ namespace Crud.Controllers
                 .Items
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
-            return item == null ? NotFound(new{message = "Item não encontrado"}) : Ok(item);
+            return item == null ? NotFound(new{message = "Item não encontrado!"}) : Ok(item);
         }
 
         // metodo para criar um novo item
@@ -62,7 +62,7 @@ namespace Crud.Controllers
 
             if (verifyExistenceProduct == null)
             {
-                return NotFound(new { message = "Produto não encontrado." });
+                return NotFound(new { message = "Produto não encontrado!" });
             }
 
           var item = new ItemModel
@@ -87,11 +87,11 @@ namespace Crud.Controllers
                     ProductName = verifyExistenceProduct.Name
                 };
                 
-                return Created($"v1/items/{{item.Id}}", item);
+                return Created($"v1/items/{{item.Id}}", new { message = "Item cadastrado com sucesso!", itemDto });;
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { message = "Erro ao criar o item.", error = e.Message });
+                return BadRequest( new {message = "Não foi possível cadastrar o Item!", error = e.Message });
             }
         }
         
@@ -110,7 +110,7 @@ namespace Crud.Controllers
                 .FindAsync(id);
                 
             if (item == null)
-                return NotFound(new { message = "Item não encontrado." });
+                return NotFound(new { message = "Item não encontrado!" });
             
             var verifyExistenceProduct = await context
                 .Products
@@ -118,7 +118,7 @@ namespace Crud.Controllers
 
             if (verifyExistenceProduct == null)
             {
-                return NotFound(new { message = "Produto não encontrado." });
+                return NotFound(new { message = "Produto não encontrado!" });
             }
 
             item.Quantity = model.Quantity;
@@ -134,7 +134,7 @@ namespace Crud.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { message = "Erro ao atualizar o item.", error = e.Message });
+                return BadRequest(new { message = "Erro ao atualizar o item!", error = e.Message });
             }
         }
         
@@ -149,17 +149,17 @@ namespace Crud.Controllers
                 .FindAsync(id);
 
             if (item == null)
-                return NotFound(new { message = "Item não encontrado." });
+                return NotFound(new { message = "Item não encontrado!" });
 
             try
             {
                 context.Items.Remove(item);
                 await context.SaveChangesAsync();
-                return Ok(new { message = "Item removido com sucesso." });
+                return Ok(new { message = "Item removido com sucesso!" });
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { message = "Erro ao remover o item.", error = e.Message });
+                return BadRequest(new { message = "Erro ao deletar o item!", error = e.Message });
             }
         }
     }

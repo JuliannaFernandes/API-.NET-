@@ -48,7 +48,7 @@ public class CartController : ControllerBase
       .Carts
       .AsNoTracking()
       .FirstOrDefaultAsync(x => x.Id == id);
-    return cart == null ? NotFound(new { message = "Carrinho não encontrado" }) : Ok(cart);
+    return cart == null ? NotFound(new { message = "Carrinho não encontrado!" }) : Ok(cart);
   }
 
   //metodo para criar um novo carrinho
@@ -65,7 +65,7 @@ public class CartController : ControllerBase
       .FirstOrDefaultAsync(i => i.Id == model.ItemId);
 
     if (item == null)
-      return NotFound(new { message = "Item não encontrado." });
+      return NotFound(new { message = "Item não encontrado!" });
 
     var cart = new CartModel
     {
@@ -76,7 +76,7 @@ public class CartController : ControllerBase
     try
     {
       if(item.Quantity == 0)
-        return BadRequest(new { message = "Item esgotado." });
+        return BadRequest(new { message = "Item esgotado!" });
       
       await context.Carts.AddAsync(cart);
       await context.SaveChangesAsync();
@@ -96,22 +96,17 @@ public class CartController : ControllerBase
         }
       };
 
-      var cartDTO = new CartDto
+      var cartDto = new CartDto
       {
         Id = cart.Id,
         Items = new List<ItemDto> { itemDto }
       };
 
-      return Created($"v1/carts/{cart.Id}", cartDTO);
+      return Created($"v1/carts/{{cart.Id}}", new { message = "Carrinho criado com sucesso!", cartDto });;
     }
     catch (Exception e)
     {
-      return StatusCode(500, new
-      {
-        message = "Erro ao criar o carrinho.",
-        error = e.Message,
-        innerException = e.InnerException?.Message
-      });
+      return BadRequest(new {message = "Não foi possível criar o carrinho!", error = e.Message });
     }
   }
 
@@ -130,14 +125,14 @@ public class CartController : ControllerBase
       .FirstOrDefaultAsync(c => c.Id == id);
 
     if (cart == null)
-      return NotFound(new { message = "Carrinho não encontrado." });
+      return NotFound(new { message = "Carrinho não encontrado!" });
 
     var item = await context.Items
       .Include(i => i.Product)
       .FirstOrDefaultAsync(i => i.Id == model.ItemId);;
 
     if (item == null)
-      return NotFound(new { message = "Item não encontrado." });
+      return NotFound(new { message = "Item não encontrado!" });
 
     cart.ItemId = item.Id;
     cart.Item = item;
@@ -149,12 +144,7 @@ public class CartController : ControllerBase
     }
     catch (Exception e)
     {
-      return StatusCode(500, new
-      {
-        message = "Erro ao atualizar o carrinho.",
-        error = e.Message,
-        innerException = e.InnerException?.Message
-      });
+      return BadRequest(new { message = "Não foi possível atualizar o carrinho!", error = e.Message });
     }
   }
   
@@ -168,7 +158,7 @@ public class CartController : ControllerBase
       .FirstOrDefaultAsync(c => c.Id == id);
 
     if (cart == null)
-      return NotFound(new { message = "Carrinho não encontrado." });
+      return NotFound(new { message = "Carrinho não encontrado!" });
 
     try
     {
@@ -178,12 +168,7 @@ public class CartController : ControllerBase
     }
     catch (Exception e)
     {
-      return StatusCode(500, new
-      {
-        message = "Erro ao deletar o carrinho.",
-        error = e.Message,
-        innerException = e.InnerException?.Message
-      });
+      return BadRequest(new { message = "Não foi possível deletar o carrinho!", error = e.Message });
     }
   }
 }
