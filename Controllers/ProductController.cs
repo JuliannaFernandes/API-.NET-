@@ -10,7 +10,6 @@ namespace Crud.Controllers
     [Route("v1")]
     public class ProductController : ControllerBase
     {
-        // metodo para listar todos os produtos
         [HttpGet("products")]
         public async Task<IActionResult> GetAsync(
             [FromServices] AppDbContext context)
@@ -22,7 +21,6 @@ namespace Crud.Controllers
             return Ok(products);
         }
         
-        // metodo para buscar um produto pelo id
         [HttpGet("products/{id}")]
         public async Task<IActionResult> GetByIdAsync(
             [FromServices] AppDbContext context,
@@ -35,7 +33,6 @@ namespace Crud.Controllers
             return products == null ? NotFound(new {message = "Produto não encontrado!" }) : Ok(products);
         }
         
-        // metodo para criar um novo produto
         [HttpPost("products")]
         public async Task<IActionResult> PostAsync(
             [FromServices] AppDbContext context,

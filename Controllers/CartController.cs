@@ -12,33 +12,24 @@ namespace Crud.Controllers;
 [Route("v1")]
 public class CartController : ControllerBase
 {
-  //metodo para listar todos os carrinhos
   [HttpGet("carts")]
   public async Task<IActionResult> GetCartsAsync(
-    [FromServices] AppDbContext context)
-  {
-    var carts = await context.Carts
-      .Include(c => c.Item)
-      .ThenInclude(i => i.Product)
-      .Select(cart => new
-      {
-        cart.Id,
-        cart.ItemId,
-        Item = new
-        {
-          cart.Item.Quantity,
-          cart.Item.UnitMeasure,
-          Product = new
-          {
-            cart.Item.Product.Name
-          }
-        }
-      })
-      .ToListAsync();
-    return Ok(carts);
-  }
-
-  //metodo para buscar um carrinho pelo id
+  [FromServices] AppDbContext context)
+{
+  var carts = await context.Carts
+    .Include(c => c.Item)
+    .ThenInclude(i => i.Product)
+    .Select(cart => new
+    {
+      cart.Id,
+      cart.QuantityCart,
+      ProductName = cart.Item.Product.Name,
+      ProductId = cart.Item.Product.Id
+    })
+    .ToListAsync();
+  return Ok(carts);
+}
+  
   [HttpGet("carts/{id}")]
   public async Task<IActionResult> GetByIdAsync(
     [FromServices] AppDbContext context,
@@ -50,8 +41,7 @@ public class CartController : ControllerBase
       .FirstOrDefaultAsync(x => x.Id == id);
     return cart == null ? NotFound(new { message = "Carrinho não encontrado!" }) : Ok(cart);
   }
-
-  //metodo para criar um novo carrinho
+  
  [HttpPost("carts")]
   public async Task<IActionResult> PostAsync(
     [FromServices] AppDbContext context,
@@ -112,64 +102,59 @@ public class CartController : ControllerBase
       return BadRequest(new {message = "Não foi possível criar o carrinho!", error = e.Message });
     }
   }
-
-  //metodo para atualizar um carrinho
- [HttpPut("carts/{id}")]
-public async Task<IActionResult> PutAsync(
-    [FromServices] AppDbContext context,
-    [FromRoute] int id,
-    [FromBody] UpdateCartViewModel model)
-{
-    if (!ModelState.IsValid)
-        return BadRequest(ModelState);
-
-    var cart = await context.Carts
-        .Include(c => c.Item)
-        .FirstOrDefaultAsync(c => c.Id == id);
-
-    if (cart == null)
-        return NotFound(new { message = "Carrinho não encontrado!" });
-
-    var item = await context.Items
-        .Include(i => i.Product)
-        .FirstOrDefaultAsync(i => i.Id == model.ItemId);
-
-    if (item == null)
-        return NotFound(new { message = "Item não encontrado!" });
-
-    // Recuperar a quantidade antiga do item no carrinho
-    var oldQuantity = cart.QuantityCart;
-
-    // Atualizar a quantidade do item no estoque
-    item.Quantity += oldQuantity; // Restaurar a quantidade antiga
-    if (item.Quantity < model.QuantityCart)
-        return BadRequest(new { message = "Quantidade insuficiente do item!" });
-
-    item.Quantity -= model.QuantityCart; // Subtrair a nova quantidade
-
-    // Atualizar a quantidade do item no carrinho
-    cart.ItemId = item.Id;
-    cart.Item = item;
-    cart.QuantityCart = model.QuantityCart;
-
-    try
-    {
-        await context.SaveChangesAsync();
-        return Ok(cart);
-    }
-    catch (Exception e)
-    {
-        return BadRequest(new { message = "Não foi possível atualizar o carrinho!", error = e.Message });
-    }
-}
   
-  //metodo para deletar um carrinho
+ [HttpPut("carts/{id}")]
+  public async Task<IActionResult> PutAsync(
+      [FromServices] AppDbContext context,
+      [FromRoute] int id,
+      [FromBody] UpdateCartViewModel model)
+  {
+      if (!ModelState.IsValid)
+          return BadRequest(ModelState);
+
+      var cart = await context.Carts
+          .Include(c => c.Item)
+          .FirstOrDefaultAsync(c => c.Id == id);
+
+      if (cart == null)
+          return NotFound(new { message = "Carrinho não encontrado!" });
+
+      var item = await context.Items
+          .Include(i => i.Product)
+          .FirstOrDefaultAsync(i => i.Id == model.ItemId);
+
+      if (item == null)
+          return NotFound(new { message = "Item não encontrado!" });
+      
+      var oldQuantity = cart.QuantityCart;
+      
+      item.Quantity += oldQuantity;
+      if (item.Quantity < model.QuantityCart)
+          return BadRequest(new { message = "Quantidade insuficiente do item!" });
+
+      item.Quantity -= model.QuantityCart;
+    
+      cart.ItemId = item.Id;
+      cart.Item = item;
+      cart.QuantityCart = model.QuantityCart;
+
+      try
+      {
+          await context.SaveChangesAsync();
+          return Ok(cart);
+      }
+      catch (Exception e)
+      {
+          return BadRequest(new { message = "Não foi possível atualizar o carrinho!", error = e.Message });
+      }
+  }
+  
   [HttpDelete("carts/{id}")]
   public async Task<IActionResult> DeleteAsync(
     [FromServices] AppDbContext context,
     [FromRoute] int id)
   {
-    var cart = await context.Carts
+    var cart = await context.Carts.Include(cartModel => cartModel.Item)
       .FirstOrDefaultAsync(c => c.Id == id);
 
     if (cart == null)
@@ -177,6 +162,7 @@ public async Task<IActionResult> PutAsync(
 
     try
     {
+      cart.Item.Quantity += cart.QuantityCart;
       context.Carts.Remove(cart);
       await context.SaveChangesAsync();
       return NoContent();
@@ -187,8 +173,3 @@ public async Task<IActionResult> PutAsync(
     }
   }
 }
-
-
-
-
-    

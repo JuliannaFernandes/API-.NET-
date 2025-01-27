@@ -11,7 +11,6 @@ namespace Crud.Controllers
     [Route("v1")]
     public class ItemController : ControllerBase
     {
-        // metodo para listar todos os items
         [HttpGet("items")]
         public async Task<IActionResult> GetItemsAsync(
             [FromServices] AppDbContext context)
@@ -33,7 +32,6 @@ namespace Crud.Controllers
             return Ok(items);
         }
         
-        // metodo para buscar um item pelo id
         [HttpGet("items/{id}")]
         public async Task<IActionResult> GetByIdAsync(
             [FromServices] AppDbContext context,
@@ -45,8 +43,7 @@ namespace Crud.Controllers
                 .FirstOrDefaultAsync(x => x.Id == id);
             return item == null ? NotFound(new{message = "Item não encontrado!"}) : Ok(item);
         }
-
-        // metodo para criar um novo item
+        
         [HttpPost("items")]
         public async Task<IActionResult> PostAsync(
             [FromServices] AppDbContext context,
@@ -95,7 +92,6 @@ namespace Crud.Controllers
             }
         }
         
-        // metodo para atualizar um item
         [HttpPut("items/{id}")]
         public async Task<IActionResult> PutAsync(
             [FromServices] AppDbContext context,
@@ -138,7 +134,6 @@ namespace Crud.Controllers
             }
         }
         
-        // metodo para deletar um item
         [HttpDelete("items/{id}")]
         public async Task<IActionResult> DeleteAsync(
             [FromServices] AppDbContext context,
@@ -154,6 +149,8 @@ namespace Crud.Controllers
             try
             {
                 context.Items.Remove(item);
+                context.Carts.RemoveRange(item.Carts);
+                
                 await context.SaveChangesAsync();
                 return Ok(new { message = "Item removido com sucesso!" });
             }
